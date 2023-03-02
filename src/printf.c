@@ -6,7 +6,7 @@
 /*   By: mdekker <mdekker@student.codam.nl>           +#+                     */
 /*                                                   +#+                      */
 /*   Created: 2023/01/22 16:34:56 by mdekker       #+#    #+#                 */
-/*   Updated: 2023/02/26 16:25:36 by mdekker       ########   odam.nl         */
+/*   Updated: 2023/03/02 13:57:02 by mdekker       ########   odam.nl         */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,40 +17,48 @@ int	ft_printf(const char *str, ...)
 {
 	va_list	args;
 	int		i;
+	int len;
 
 	i = 0;
-
+	len = 0;
 	va_start(args, str);
 	while (str[i] != '\0')
 	{
 		if (str[i] == '%')
 		{
 			i++;
-			ft_pseudoSwitch((char *)str, i, args);
+			len += ft_pseudoSwitch((char *)str, i, args);
 		}
 		else
-			ft_putchar(str[i]);
+			len += ft_putchar_fd(str[i], 1);
 		i++;
 	}
-	return (0);
+	return (len);
 }
 
-void ft_pseudoSwitch(char *str, int i, va_list args)
+int	ft_pseudoSwitch(char *str, int i, va_list args)
 {
 	if (str[i] == 'c')
-		ft_putchar(va_arg(args, int));
+		return (ft_putchar_fd(va_arg(args, int), 1));
 	else if (str[i] == 's')
-		ft_putstr(va_arg(args, char *));
+		return (ft_putstr_fd(va_arg(args, char *), 1));
 	else if (str[i] == 'p')
-		ft_putpointer(va_arg(args, void *));
+		return (ft_putpointer(va_arg(args, void *)));
 	else if (str[i] == 'd' || str[i] == 'i')
-		ft_putnbr(va_arg(args, int));
+		return (ft_putnbr_fd(va_arg(args, int), 1));
 	else if (str[i] == 'u')
-		ft_putunbr(va_arg(args, unsigned int));
+		return (ft_putunum(va_arg(args, unsigned int)));
 	else if (str[i] == 'x')
-		ft_puthex(va_arg(args, unsigned int), 0);
+		return (ft_puthex(va_arg(args, unsigned int), 0));
 	else if (str[i] == 'X')
-		ft_puthex(va_arg(args, unsigned int), 1);
+		return (ft_puthex(va_arg(args, unsigned int), 1));
 	else if (str[i] == '%')
-		ft_putchar('%');
+	{
+		if (str[i - 1] == '%')
+			return (ft_putchar_fd('%', 1));
+		else
+			return (ft_putchar_fd('%', 1));
+	}
+	else
+		return (-1);
 }
